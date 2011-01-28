@@ -1,0 +1,9 @@
+RandomT: declarative probabilistic programming
+==============================================
+
+Installation
+
+python setup.py build
+python setup.py install
+
+Examples in examples/ directory.

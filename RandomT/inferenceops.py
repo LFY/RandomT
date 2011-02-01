@@ -73,8 +73,6 @@ def generate_cpts(ln):
 
 	vs = [v for v in ln.assn_order if type(v) is not Probability]
 
-	assert(reduce(lambda x, y: x and y, map(lambda v: v.exact, vs)))
-
 	for v in vs:
 		var_cpt_map[v] = get_cpt(v, domains)
 		string_ids[v] = "v" + str(id(v))

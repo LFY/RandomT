@@ -16,15 +16,12 @@ print Z.sample()
 print Z.sample()
 print Z.sample()
 print Z.sample()
-#print Pr(Z, {}, RejectionSampler)
+
 print Pr(Z)
 print Pr(Flip())
 X = Flip()
 Y = Flip()
 Z = X + Y
-print X.exact
-print Y.exact
-print Z.exact
 print Pr(X + Y, {}, VarElim)
 
 Z = Uniform(2, 3)

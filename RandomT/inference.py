@@ -30,7 +30,7 @@ class VarElim(InferenceEngine):
 		return to_distr(cpt.project(reduced_cpt, (var,)))
 
 
-from monad import isFunction	
+from functional import isFunction	
 
 def Marginalize(var, evidence={}, engine_constructor=RejectionSampler):
 	engine = engine_constructor(LazyNet([var] + list(evidence.keys())))
@@ -62,22 +62,18 @@ def Pr(_query, evidence={}, impl=None, num_samples=9001):
 	all_vars += evidence.keys()	
 
 	# Delegate a possible inference algorithm if the user doesn't specify one.
-	if impl is None:
-		if all_exact(LazyNet(all_vars).getvars()):
-			impl = VarElim
-		else:
-			impl = RejectionSampler
 	
+	if impl is None:
+		impl = delegate_inference(all_vars)
+
 	if len(query_evidence.keys()) > 0:
 		return ProbOf(query_evidence, evidence, impl)
 	else:
 		return Marginalize(query, evidence, impl)
 
+# TODO: Make this do all the exactness detection
 def delegate_inference(all_vars):
-	if all_exact(LazyNet(all_vars).getvars()):
-		return VarElim
-	else:
-		return RejectionSampler
+	return RejectionSampler
 
 def ML_distr(d):
 	ml_key, ml_prob = d.items()[0]

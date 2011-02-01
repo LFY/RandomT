@@ -8,7 +8,6 @@ def normalize(xs):
 class Dist(dict):
 	def __init__(self, *args):
 		dict.__init__(self, *args)
-		self.exact = True
 		kv = zip(*self.items())
 		kv[1] = normalize(kv[1])
 		kv = zip(*kv)

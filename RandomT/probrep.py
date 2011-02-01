@@ -3,8 +3,7 @@ from bn import BayesNet
 from bn import LazyNet
 from cpt import FactorTable
 from itertools import product
-from monad import isFunction
-from monad import full_unwrap
+from functional import isFunction
 
 from distrep import Dist
 	
@@ -20,35 +19,23 @@ class Computation(object):
 		self.cpt = None
 		self.smp_cache = None
 
-		self.exact = False
 
-		self.net = None
-		self.lazynet = None
 		self.srcname = ""
 		
 		self.args = a
-		if len(filter(lambda x: not x.exact, self.args)) == 0:
-			self.exact = True
 
 		if not isFunction(source):
 			if type(source) == Dist: # Dist
 				self.dist = Dist(source)
-				self.exact = True
 			else: # constant expression
 				if type(source) is not list and type(source) is not dict:
 					self.dist = Dist({source : 1.0})				
-					self.exact = True
 				
 			self.src = lambda : source
 		else:
 			self.src = source
 			self.srcname = source.__name__
-			
-		
 # COMMON==================================================================
-		self.samples = []
-
-		# TODO: fix exact/nonexact detection. Maybe delay until inference time?
 
 	def __eq__(self, other):
 		return self.__hash__() == other.__hash__()
@@ -56,20 +43,14 @@ class Computation(object):
 		return self.__repr__().__hash__()
 	
 	def getLN(self,):
+		return LazyNet((self,))
 		if self.lazynet is None:
 			self.lazynet = LazyNet((self,))
 		return self.lazynet
 	
 	def eval(self, *args):
 		return self.src(*args)
-	
 		
-	# returns a bayes net
-	def construct_bn(self,):
-		if self.cpt == 'Placeholder CPT':
-			return self.cpt
-		else:
-			return self.cpt
 		
 	def info(self,):
 		return "Random<T>: self=%s src=%s args=%s\n" % (self, self.src, self.args) 
@@ -85,10 +66,10 @@ class Computation(object):
 
 	def get_args(self,):
 		return self.args
-		
+	
+# Would be nice to remove this too.
 class Sampler(Computation):
 	def get_sample(self,):
-		# pop_samples -> run scheme currently only works when the composing functions are deterministic. Not a general memoization scheme.
 		self.sample_leaves()
 		self.sample_trunk()
 		val = self.smp_cache
@@ -102,7 +83,8 @@ class Sampler(Computation):
 			self.smp_cache = None
 			for a in args:
 				a.invalidate_cache()
-				
+	
+	# Contains flattening; move this somewhere else or don't do it at all
 	def sample_trunk(self,):
 		func = self.get_src()
 		args = self.get_args()
@@ -111,19 +93,16 @@ class Sampler(Computation):
 			return self.smp_cache
 		else:
 			self.smp_cache = func(*map(lambda x: x.sample_trunk(), args))
-			if type(type(self.smp_cache)) is not type(type(1)):
-				self.smp_cache = full_unwrap(self.smp_cache, lambda x: x.get_sample())
 			
 			return self.smp_cache
-	
+
+	# also contains flattening
 	def sample_leaves(self,):
 		func = self.get_src()
 		args = self.get_args()
 		
 		if len(args) == 0:
 			self.smp_cache = func()
-			if type(type(self.smp_cache)) is not type(type(1)):
-				self.smp_cache = full_unwrap(self.smp_cache, lambda x: x.get_sample())
 		else:
 			for a in args:
 				a.sample_leaves()
@@ -131,48 +110,10 @@ class Sampler(Computation):
 	def sample_fixed(self,):
 		return self.sample_trunk()
 		
-	   #func = self.get_src()
-	   #args = self.get_args()
-	   #
-	   #for a in args:
-	   #	assert(a.smp_cache is not None)
-	   #
-	   #self.smp_cache = func(*map(lambda x: x.smp_cache, args))
-	   #return self.smp_cache
-		
 	def info(self,):
 		return "Random<T>: self=%s src=%s args=%s smp=%s dist=%s\n" % (self, self.get_src(), self.get_args(), self.smp_cache, self.dist) 
 	
-	def fill_samples(self, N=9001):
-		while len(self.samples) < N:
-			self.samples.append(self.get_sample())
-				
-	def debug_get_sample(self,):
-		print "Before Sampling"
-		self.invalidate_cache()
-		print self.full_info()
-		
-		print "Sample Leaves"
-		self.sample_leaves()
-		print self.full_info()
-		
-		print "Sample Trunk"
-		self.sample_trunk()
-		print self.full_info()
-		
-		print "Sample Fixed"
-		val2 = self.sample_fixed()
-		print self.full_info()
-		val2 = self.sample_fixed()
-		print self.full_info()
-		val2 = self.sample_fixed()
-		print self.full_info()
-		
-		val = self.smp_cache
-		return val		
-
 class Probability(Sampler):
-	
 	# Now: Sample conditioned on evidence, by retrieving the lazynet and producing samples from there.
 	def sample(self, evidence={}):
 		if evidence == {}:
@@ -182,96 +123,3 @@ class Probability(Sampler):
 	
 	def debug_sample(self,):
 		return self.debug_get_sample()
-	
-	def Pr_exact(self, pred, evidence={}):
-		N = self.get_nets()
-		return query(N.varelim(self, evidence), pred)
-		
-	def Pr(self, ind_func):
-		samples = 9001
-		positive = 0
-		negative = 0
-		for s in range(samples):
-			if ind_func(self.sample()) is True:
-				positive = positive + 1
-			else:
-				negative = negative + 1
-		return positive / float(positive + negative)
-
-	def Pr_eq(self, value):
-		return self.Pr(lambda x: x == value)
-
-	# Conditional probability.
-	def Pr_cond(self, ind_func, cond_var):
-		samples = 9001
-		int_isvalue = 0
-		int_notvalue = 0
-		cond_isvalue = 0
-		cond_notvalue = 0
-		for s in range(samples):
-			condval = cond_var.sample()
-			if condval is True:
-				cond_isvalue = cond_isvalue + 1
-			else:
-				cond_notvalue = cond_notvalue + 1
-			selfval = self.sample()
-			
-			if ind_func(selfval) is True:
-				if cond_var.sample_fixed() is True:
-					int_isvalue = int_isvalue + 1
-				else:
-					int_notvalue = int_notvalue + 1
-			else:
-				int_notvalue = int_notvalue + 1
-				
-		
-		Pr_intersection = int_isvalue / float(int_isvalue + int_notvalue)
-		Pr_cond = cond_isvalue / float(cond_isvalue + cond_notvalue)
-				
-		return Pr_intersection / Pr_cond
-	
-	def get_nets(self):
-		if self.net is None:
-			def _get_nets(v):
-				if len(v.args) == 0:
-					return [v.cpt]
-				else:
-					return [v.cpt] + reduce(lambda x, y: x + y, [_get_nets(a) for a in v.args])
-
-			# remove dupes
-		
-			raw = _get_nets(self)
-			res = []
-			for r in raw:
-				if r not in res:
-					res.append(r)
-		
-			self.net = BayesNet(res)
-		
-		return self.net
-	
-	# returns the posterior distribution.
-	def get_distr(self):
-		if self.dist is not None:
-			return self.dist
-		elif self.exact:
-			N = self.get_nets()
-			D = N.varelim(self)
-			return oneargfactor_to_dist(D)
-		else:	
-			pass
-			
-			samples = 9001
-			vals = {}
-			for s in range(samples):
-				v = self.sample()
-			
-				if vals.get(v) is None:
-					vals[v] = 0.0
-				else:
-					vals[v] = vals[v] + 1.0 / samples
-				
-			return vals
-			
-
-

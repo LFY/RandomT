@@ -1,6 +1,6 @@
 from randomt import Random, rnd
 from randomlist import *
-from monad import isFunction
+from functional import isFunction
 
 class Function(object):
 	def __init__(self, f):

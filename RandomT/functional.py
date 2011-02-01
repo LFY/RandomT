@@ -1,8 +1,7 @@
-# Monadic computations in Python.
 
 classcache = {}
 
-# construct_class a :: a -> M a
+# Simulating type constructors
 
 def construct_class(base_type, meta_class):
 	name = meta_class.__name__ + base_type.__name__
@@ -17,17 +16,15 @@ def construct_with_bases(c, meta):
 	else:
 		return classcache[name]
 
+# NO
+# def full_unwrap(x, unwrap):
+#	v = unwrap(x)
+#	while type(type(v)) is not type(type(1)):
+		#v = unwrap(x)
+#	return v
 
-def full_unwrap(x, unwrap):
-	v = unwrap(x)
-	while type(type(v)) is not type(type(1)):
-		v = unwrap(x)
-	return v
-	
-# bind :: (a -> M b) -> M a -> (M a -> M b)
-# bind_fmap :: (a -> b) -> M a -> (M a -> M b)
-
-def bind(func, meta_class, unwrap):
+# Now this is not really a monad. This is a functor and 'join' :: m (m a) -> m a is _purposely_ left undefined
+def fmap(func, meta_class, unwrap):
 	def call(*args, **kwargs):
 #		print 'call to %s with args %s' % (func.__name__, args)
 		newargs = []
@@ -37,16 +34,18 @@ def bind(func, meta_class, unwrap):
 			else:
 				newargs.append(a)
 #		print 'initial type test'
-		rtval = func(*map(lambda x: full_unwrap(x, unwrap), newargs))
+		rtval = func(*map(lambda x: unwrap(x), newargs))
 #		truetype = get_base_type(rtval, meta_class, unwrap)
 #		print 'end initial type test'
 		# Flattening
-		if type(type(rtval)) is meta_class:
-			truetype = type(unwrap(rtval))
-			def construction_function(*a, **aa):
-				return func(*a, **aa)
-			construction_function.__name__ = func.__name__
-			return construct_class(truetype, meta_class)(construction_function, *newargs, **kwargs)		
+
+		# Determine type dynamically, requires a way to inhabit the type with 'unwrap'
+		#if type(type(rtval)) is meta_class:
+	#		truetype = type(unwrap(rtval))
+#			def construction_function(*a, **aa):
+#				return func(*a, **aa)
+#			construction_function.__name__ = func.__name__
+#			return construct_class(truetype, meta_class)(construction_function, *newargs, **kwargs)		
 		def construction_function(*a, **aa):
 			return func(*a, **aa)
 		construction_function.__name__ = func.__name__

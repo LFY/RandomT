@@ -37,7 +37,7 @@ def Variance(v):
 	else:
 		return Expectation(v * v) - Expectation(v) ** 2
 
-from monad import isFunction
+from functional import isFunction
 
 # A covariance function.
 def Covariance(u, v):

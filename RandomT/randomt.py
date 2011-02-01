@@ -1,4 +1,4 @@
-from monad import *
+from functional import *
 from classdict import *
 
 # Probability representation. TODO: Should be "continuation" representations, so Sampler vs. Dist is dealt with at a lower level.
@@ -7,7 +7,6 @@ from probrep import Sampler
 from probrep import Probability
 
 from distrep import Dist
-from distrep import Density
 
 from random import uniform
 
@@ -17,7 +16,7 @@ def rnd_unwrap(R):
 	return R.sample()
 
 def rnd(f):
-	return bind(f, Random_, lambda x: x.sample())
+	return fmap(f, Random_, lambda x: x.sample())
 
 import inspect
 
@@ -25,8 +24,6 @@ import inspect
 class ProbMethodRestrictor(DictOp):
 	def __init__(self):
 		self.op = DictTypeFilter(FunctionType, type(int.__add__), type(list.insert))
-
-#ProbDecorate = DictValueMap(lambda f: rnd(f))
 
 def rand_method(self, f, *args, **kwargs):
 	return RandomClassMethod(f, self)(*args, **kwargs)
@@ -43,12 +40,10 @@ RDT = DictTransform(MethodRestrictor(), MetaPropertyExcluder(), ProbDecorate, Mi
 # The Random metaclass.
 class Random_(type):
 	def __new__(meta, classname, bases, classDict):
-		# If we're already trying to transform a Random type, dont do any decoration, use Python's default class construction.
 		if type(bases[0]) is Random_:
 			return type.__new__(meta, classname, bases, classDict)
 		else: # Else, promote the class as follows:
 			
-			# Dictionary transformation: bind all member functions, mix in probabilistic calculations.
 			newClassDict = RDT(bases[0].__dict__)
 			
 			def promote(*args):
@@ -65,10 +60,6 @@ class Random_(type):
 				self.cpt = None
 				self.smp_cache = None
 
-				self.exact = False
-
-				self.net = None
-				self.lazynet = None
 				self.srcname = ""
 				
 				if len(args) > 0 and isFunction(args[0]): # Should work like Sampler
@@ -76,31 +67,18 @@ class Random_(type):
 					self.args = promote(*newargs)
 					self.src = lambda *a : args[0](*a)
 					self.srcname = args[0].__name__
-#					self.src = args[0]
 				else: # Should work like the base class constructor
-				
-					# the case where we're fed a Dist as the constructing argument
 					if len(args) == 1 and type(args[0]) == Dist:
 						self.dist = Dist(args[0])
-						self.exact = True
-						self.args = []
-					elif len(args) == 1 and type(args[0]) == Density:
-						self.dist = Density(args[0])
-						self.exact = False
-						self.continuous = True
 						self.args = []
 					else:
-						#if bases[0] is not list and bases[0] is not dict:
 						val = bases[0](*args)
 						self.dist = Dist({val : 1})
-						self.exact = True
 						
 						self.args = promote(*args)
 						self.src = lambda *a: bases[0](*a)
-					self.src = self.dist.sample	
+					self.src = self.dist.sample
 # COMMON================================================================	
-				self.samples = []
-				self.init_cpt()
 				
 			newClassDict['__init__'] = custom_constructor
 			return type.__new__(meta, classname, (), newClassDict)

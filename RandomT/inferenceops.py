@@ -1,7 +1,6 @@
 from cpt import FactorTable
 from probrep import Probability
 
-from distrep import Density
 from distrep import Dist
 
 from probrep import dist_to_factor
@@ -31,6 +30,7 @@ def generate_cpts(ln):
 		mydomain = None
 
 		# make the cpt
+		# TODO: make this realy construct the cpt
 		if v.dist is not None:
 			cpt = dist_to_factor(v, v.dist)
 			mydomain = v.dist.keys()
@@ -73,8 +73,6 @@ def generate_cpts(ln):
 
 	vs = [v for v in ln.assn_order if type(v) is not Probability]
 
-	assert(reduce(lambda x, y: x and y, map(lambda v: v.exact, vs)))
-
 	for v in vs:
 		var_cpt_map[v] = get_cpt(v, domains)
 		string_ids[v] = "v" + str(id(v))
@@ -88,6 +86,10 @@ def generate_cpts(ln):
 
 	ordered_domains = remove_probtype(ordered_domains)
 
+
+	# A dictionary from python RandomT variables to their cpts
+	# then the variables themselves
+	# then indices of each variable, if we want to do code generation
 	return (var_cpt_map, vs, ordered_domains, string_ids)
 
 def all_exact(vs):

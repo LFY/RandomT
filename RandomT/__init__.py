@@ -13,11 +13,6 @@ from randomstring import *
 from randomtuple import *
 from randomfunc import *
 
-# Distribution representation
-
-from distrep import Dist
-from distrep import Density
-
 # Inference
 
 # TO BE REORGANIZED

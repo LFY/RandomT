@@ -1,3 +1,5 @@
+from random import uniform
+
 def normalize(xs):
 	s = float(sum(xs))
 	if s == 0:
@@ -27,4 +29,5 @@ class Dist(dict):
 				ind = i
 				break				
 		return vals[ind]
+
 

@@ -23,7 +23,8 @@ class VarElim(InferenceEngine):
 		def get_cpts(ln):
 			return [x.cpt for x in ln.getvars()]
 		InferenceEngine.__init__(self, expr)
-		self.bn = BayesNet(get_cpts(expr))
+		cpts = get_cpts(expr)
+		self.bn = BayesNet(generate_cpts(expr)[0].values())
 	def marginalize(self, var, evidence={}):
 		reduced_cpt = self.bn.varelim(var, evidence)
 		return to_distr(cpt.project(reduced_cpt, (var,)))
@@ -41,9 +42,9 @@ def ProbOf(var_query, evidence={}, engine_constructor=RejectionSampler):
 	query = var_query.values()[0]
 	
 	if isFunction(query):
-		return reduce(lambda x, y: x + y, map(lambda x: marg_result[x], filter(lambda x: query(x), marg_result.keys())))
+		return reduce(lambda x, y: x + y, map(lambda x: marg_result[x], filter(lambda x: query(x), marg_result.keys())), 0.0)
 	else:
-		return reduce(lambda x, y: x + y, map(lambda x: marg_result[x], filter(lambda x: x is query, marg_result.keys())))
+		return reduce(lambda x, y: x + y, map(lambda x: marg_result[x], filter(lambda x: x is query, marg_result.keys())), 0.0)
 
 def Mode(var, evidence={}, engine_constructor=RejectionSampler):
 	marg_result = Marginalize(var_query.keys()[0], evidence, engine_constructor)

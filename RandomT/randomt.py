@@ -69,6 +69,9 @@ class Random_(type):
 				self.net = None
 				self.lazynet = None
 				self.srcname = ""
+
+				if len(filter(lambda x: not x.exact, args[1:])) == 0:
+					self.exact = True
 				
 				if len(args) > 0 and isFunction(args[0]): # Should work like Sampler
 					newargs = args[1:]
@@ -94,7 +97,6 @@ class Random_(type):
 					self.src = self.dist.sample
 # COMMON================================================================	
 				self.samples = []
-				self.init_cpt()
 				
 			newClassDict['__init__'] = custom_constructor
 			return type.__new__(meta, classname, (), newClassDict)

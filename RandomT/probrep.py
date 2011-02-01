@@ -14,56 +14,6 @@ def dist_to_factor(name, dist):
 		res.addObservation({name: v}, p)
 	return res
 
-def init_one_cpt(self):
-	self.domain = None
-	# make the cpt
-
-	if self.dist is not None and type(self.dist) == Dist:
-		self.cpt = dist_to_factor(self, self.dist)
-		self.domain = self.dist.keys()
-	elif not self.exact and len(self.args) is not 0 and reduce(lambda x, y: x and y, map(lambda x: x.exact, self.args)):
-		self.cpt = FactorTable(self, [self] + self.args)
-		domains = map(lambda x: x.domain, self.args)
-		var_dom_map = dict(zip(self.args, domains))
-		# is the assigment consistent with naming.
-		def is_consistent(obs):
-			from digraph import edges_to_adjs
-			obs_d = edges_to_adjs(obs)
-			for v in obs_d.values():
-				if len(set(v)) > 1:
-					return False
-			return True
-		for x in product(*domains):
-			r = self.src(*x)
-			if hasattr(r, 'dist') and r.dist is not None:
-				for (v, p) in r.dist.items():
-					obs = zip([self] + self.args, [v] + list(x))
-					if is_consistent(obs):
-						self.cpt.addObservation(dict(obs), p)
-			else:
-				obs = zip([self] + self.args, [r] + list(x))
-				if is_consistent(obs):
-					self.cpt.addObservation(dict(zip([self] + self.args, [r] + list(x))), 1.0)
-		self.domain = self.cpt.getDomain(self)
-		self.exact = True
-	if self.dist is not None and len(self.args) == 0 and type(self.dist) == Dist:
-		def generating_function():
-			t = uniform(0,1)
-			probs = [v for (k, v) in self.dist.items()]
-			vals = [k for (k, v) in self.dist.items()]
-			ind = 0
-							
-			for i in range(len(probs)):
-				if i is not 0:
-					probs[i] = probs[i] + probs[i - 1]
-			for i in range(len(probs)):
-				if t < probs[i]:
-					ind = i
-					break				
-			return vals[ind]
-
-		self.src = generating_function
-
 class Computation(object):
 	def __init__(self, source, *a):
 		self.dist = None
@@ -76,7 +26,10 @@ class Computation(object):
 		self.lazynet = None
 		self.srcname = ""
 		
-		
+		self.args = a
+		if len(filter(lambda x: not x.exact, self.args)) == 0:
+			self.exact = True
+
 		if not isFunction(source):
 			if type(source) == Dist: # Dist
 				self.dist = Dist(source)
@@ -91,11 +44,11 @@ class Computation(object):
 			self.src = source
 			self.srcname = source.__name__
 			
-		self.args = a
 		
 # COMMON==================================================================
 		self.samples = []
-		self.init_cpt()
+
+		# TODO: fix exact/nonexact detection. Maybe delay until inference time?
 
 	def __eq__(self, other):
 		return self.__hash__() == other.__hash__()
@@ -110,9 +63,6 @@ class Computation(object):
 	def eval(self, *args):
 		return self.src(*args)
 	
-	def init_cpt(self,):
-		init_one_cpt(self)
-
 		
 	# returns a bayes net
 	def construct_bn(self,):

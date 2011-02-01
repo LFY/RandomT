@@ -1,7 +1,6 @@
 from cpt import FactorTable
 from probrep import Probability
 
-from distrep import Density
 from distrep import Dist
 
 from probrep import dist_to_factor

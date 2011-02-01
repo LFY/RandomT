@@ -7,7 +7,6 @@ from probrep import Sampler
 from probrep import Probability
 
 from distrep import Dist
-from distrep import Density
 
 from random import uniform
 
@@ -84,11 +83,6 @@ class Random_(type):
 						self.dist = Dist(args[0])
 						self.exact = True
 						self.args = []
-					elif len(args) == 1 and type(args[0]) == Density:
-						self.dist = Density(args[0])
-						self.exact = False
-						self.continuous = True
-						self.args = []
 					else:
 						#if bases[0] is not list and bases[0] is not dict:
 						val = bases[0](*args)
@@ -97,7 +91,7 @@ class Random_(type):
 						
 						self.args = promote(*args)
 						self.src = lambda *a: bases[0](*a)
-					self.src = self.dist.sample	
+					self.src = self.dist.sample
 # COMMON================================================================	
 				self.samples = []
 				self.init_cpt()

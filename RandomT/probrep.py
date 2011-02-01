@@ -7,7 +7,6 @@ from monad import isFunction
 from monad import full_unwrap
 
 from distrep import Dist
-from distrep import Density
 	
 def dist_to_factor(name, dist):
 	res = FactorTable(name, (name,))
@@ -72,7 +71,6 @@ class Computation(object):
 		self.smp_cache = None
 
 		self.exact = False
-		self.continuous = False
 
 		self.net = None
 		self.lazynet = None
@@ -83,10 +81,6 @@ class Computation(object):
 			if type(source) == Dist: # Dist
 				self.dist = Dist(source)
 				self.exact = True
-			elif type(source) == Density:
-				self.dist = Density(source)
-				self.exact = False
-				self.continuous = True
 			else: # constant expression
 				if type(source) is not list and type(source) is not dict:
 					self.dist = Dist({source : 1.0})				

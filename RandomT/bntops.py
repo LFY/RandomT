@@ -166,32 +166,6 @@ def bnt_ordered_cpt_rows(t, top_order):
 		new_rows.append(new_row)
 	return new_rows
 
-def t_bnt_ordered_cpt_rows():
-	from RandomT import *
-
-	X = Flip()
-	Y = Flip()
-	Z = X + Y
-
-	t = Z.cpt
-
-	print t
-
-	print X
-	print Y
-	print Z
-
-	print bnt_ordered_cpt_rows(t, (X, Y, Z))
-
-	print abs(X.__hash__())
-	print abs(Y.__hash__())
-	print abs(Z.__hash__())
-
-	print id(X)
-	print id(Y)
-	print id(Z)
-
-	print generate_cpts(LazyNet((Z,)))
 
 from cpt import FactorTable
 
@@ -204,21 +178,6 @@ def bnt_redomain_table(t, ordered_domain):
 		new_table.addObservation(transform_row(r), p)
 	return new_table
 
-def t_bnt_redomain_table():
-	from RandomT import *
-
-	X = Flip()
-	Y = Flip()
-	Z = X + Y
-
-	t = Z.cpt
-
-	d = generate_cpts(LazyNet((Z, )))
-
-	print bnt_redomain_table(t, d[2])
-
-	# From the top.
-	print bnt_ordered_cpt_rows(bnt_redomain_table(t, d[2]), (X, Y, Z))
 
 from digraph import adjs_to_edges
 

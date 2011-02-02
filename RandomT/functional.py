@@ -45,34 +45,34 @@ def fmap(func, meta_class, unwrap):
 
 		# This runs the original function. It is assumed that the incoming arguments to the function return a meaningful value after 'unwrap' that will be compatible with the original function; it is assumed that func will return a meaningful value of type a that we then promote to type R a
 		# The return value is only used to determine the type of the result
-		print "Sampled arguments"
-		print map(lambda x: unwrap(x), newargs)
-		print "Observed return value"
+		#print "Sampled arguments"
+		#print map(lambda x: unwrap(x), newargs)
+		#print "Observed return value"
 		rtval = func(*map(lambda x: unwrap(x), newargs))
-		print rtval
+		#print rtval
 
 		# Determine type dynamically, requires a way to inhabit the type with 'unwrap'
 		# This is interesting. Why doesn't this cahnge the behavior of meta, but breaks watersprinkler?
 		# Ok, I see, it turns certain things into 'None'
-		#if type(type(rtval)) is meta_class:
-		#	truetype = type(unwrap(rtval))
-		#	def construction_function(*a, **aa):
-		#		return func(*a, **aa)
-		#	construction_function.__name__ = func.__name__ # Keep the name of the old function, for more meaningful debug outputs
-		#	return construct_class(truetype, meta_class)(construction_function, *newargs, **kwargs)		
+		if type(type(rtval)) is meta_class:
+			truetype = type(unwrap(rtval))
+			def construction_function(*a, **aa):
+				return func(*a, **aa)
+			construction_function.__name__ = func.__name__ # Keep the name of the old function, for more meaningful debug outputs
+			return construct_class(truetype, meta_class)(construction_function, *newargs, **kwargs)		
 		def construction_function(*a, **aa):
 			return func(*a, **aa)
 		construction_function.__name__ = func.__name__
-		print 'newargs:'
-		print newargs
-		print 'done'
+		#print 'newargs:'
+		#print newargs
+		#print 'done'
 
 		newtype = construct_class(type(rtval), meta_class)
 
-		print newtype
-		print newtype.__init__
+		#print newtype
+		#print newtype.__init__
 
-		print "about to call the randomt constructor"
+		#print "about to call the randomt constructor"
 		
 		return construct_class(type(rtval), meta_class)(construction_function, *newargs, **kwargs)
 	call.__name__ = func.__name__

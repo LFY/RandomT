@@ -23,7 +23,9 @@ def construct_with_bases(c, meta):
 		#v = unwrap(x)
 #	return v
 
-# Now this is not really a monad. This is a functor and 'join' :: m (m a) -> m a is _purposely_ left undefined
+# Now this is not really a monad. This is a functor and 'join' :: m (m a) -> m a is _purposely_ left undefined until inference time
+# At inference time, we collapse the 'tower' of Random(RandomT)'s that have formed--declaratively, over possibly different 'join' functions
+
 def fmap(func, meta_class, unwrap):
 	def call(*args, **kwargs):
 #		print 'call to %s with args %s' % (func.__name__, args)
@@ -33,22 +35,12 @@ def fmap(func, meta_class, unwrap):
 				newargs.append(construct_class(type(a), meta_class)(a))
 			else:
 				newargs.append(a)
-#		print 'initial type test'
 		rtval = func(*map(lambda x: unwrap(x), newargs))
-#		truetype = get_base_type(rtval, meta_class, unwrap)
-#		print 'end initial type test'
-		# Flattening
 
-		# Determine type dynamically, requires a way to inhabit the type with 'unwrap'
-		#if type(type(rtval)) is meta_class:
-	#		truetype = type(unwrap(rtval))
-#			def construction_function(*a, **aa):
-#				return func(*a, **aa)
-#			construction_function.__name__ = func.__name__
-#			return construct_class(truetype, meta_class)(construction_function, *newargs, **kwargs)		
 		def construction_function(*a, **aa):
 			return func(*a, **aa)
 		construction_function.__name__ = func.__name__
+		# interesting.
 		return construct_class(type(rtval), meta_class)(construction_function, *newargs, **kwargs)
 	call.__name__ = func.__name__
 	return call

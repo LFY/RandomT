@@ -34,7 +34,5 @@ R = Rain(C)
 W = Grass(S, R)
 
 print Pr(W)
-#print Pr(W, {}, 'OpenBayes')
-#print Pr(W, {}, 'BNT')
 
 print debug_output(W, locals())

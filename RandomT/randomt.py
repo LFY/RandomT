@@ -1,10 +1,8 @@
 from functional import *
 from classdict import *
 
-# Probability representation. TODO: Should be "continuation" representations, so Sampler vs. Dist is dealt with at a lower level.
+from probrep import sampleVar
 from probrep import Computation
-from probrep import Sampler
-from probrep import Probability
 
 from distrep import Dist
 
@@ -16,7 +14,7 @@ def rnd_unwrap(R):
 	return R.sample()
 
 def rnd(f):
-	return fmap(f, Random_, lambda x: x.sample())
+	return fmap(f, Random_, sampleVar)
 
 import inspect
 
@@ -31,11 +29,12 @@ def rand_method(self, f, *args, **kwargs):
 ProbDecorate = DictValueMap(lambda f: rnd(f))
 
 MixinComputation = DictOp(dict_add, Computation.__dict__)
-MixinSampler = DictOp(dict_add, Sampler.__dict__)
-MixinProbRep = DictOp(dict_add, Probability.__dict__)
+#MixinSampler = DictOp(dict_add, Sampler.__dict__)
+#MixinProbRep = DictOp(dict_add, Probability.__dict__)
 #RDT = DictTransform(MethodRestrictor(), MetaPropertyExcluder(), ProbDecorate, MixinProbRep, MethodRestrictor(), MetaPropertyExcluder())
 
-RDT = DictTransform(MethodRestrictor(), MetaPropertyExcluder(), ProbDecorate, MixinComputation, MixinSampler, MixinProbRep, ProbMethodRestrictor(), MetaPropertyExcluder())
+#RDT = DictTransform(MethodRestrictor(), MetaPropertyExcluder(), ProbDecorate, MixinComputation, MixinSampler, MixinProbRep, ProbMethodRestrictor(), MetaPropertyExcluder())
+RDT = DictTransform(MethodRestrictor(), MetaPropertyExcluder(), ProbDecorate, MixinComputation, ProbMethodRestrictor(), MetaPropertyExcluder())
 
 # The Random metaclass.
 class Random_(type):
@@ -52,7 +51,7 @@ class Random_(type):
 					if type(type(a)) is Random_:
 						newargs.append(a)
 					else:
-						newargs.append(Probability(a))
+						newargs.append(Computation(a)) # ugly delegation to 'leaf' type. wish there was a way to take this out
 				return newargs
 
 			def custom_constructor(self, *args):

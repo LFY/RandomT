@@ -1,5 +1,5 @@
 from cpt import FactorTable
-from probrep import Probability
+from probrep import Computation
 
 from distrep import Dist
 
@@ -71,14 +71,14 @@ def generate_cpts(ln):
 	ordered_domains = {}
 	var_cpt_map = {}
 
-	vs = [v for v in ln.assn_order if type(v) is not Probability]
+	vs = [v for v in ln.assn_order if type(v) is not Computation]
 
 	for v in vs:
 		var_cpt_map[v] = get_cpt(v, domains)
 		string_ids[v] = "v" + str(id(v))
 		string_var_ids[string_ids[v]] = v
 
-	remove_probtype = lambda d: dict(filter(lambda (x, y): type(x) is not Probability, d.items()))
+	remove_probtype = lambda d: dict(filter(lambda (x, y): type(x) is not Computation, d.items()))
 	domains = remove_probtype(domains)
 
 	for (v, d) in domains.items():

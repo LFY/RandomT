@@ -39,9 +39,14 @@ RDT = DictTransform(MethodRestrictor(), MetaPropertyExcluder(), ProbDecorate, Mi
 # The Random metaclass.
 class Random_(type):
 	def __new__(meta, classname, bases, classDict):
+		# We sort of need this conditional here so that subclasses of Random_ work correctly.
 		if type(bases[0]) is Random_:
+			print 'is already Random_, not promoting'
 			return type.__new__(meta, classname, bases, classDict)
 		else: # Else, promote the class as follows:
+			print 'going to create constructor for type %s' % bases[0]
+			print bases
+			print classname
 			
 			newClassDict = RDT(bases[0].__dict__)
 			
@@ -55,6 +60,7 @@ class Random_(type):
 				return newargs
 
 			def custom_constructor(self, *args):
+				print args
 				self.dist = None
 				self.cpt = None
 				self.smp_cache = None
@@ -77,9 +83,12 @@ class Random_(type):
 						self.args = promote(*args)
 						self.src = lambda *a: bases[0](*a)
 					self.src = self.dist.sample
-# COMMON================================================================	
+	# COMMON================================================================	
 				
 			newClassDict['__init__'] = custom_constructor
+			print 'just made a new class'
+			print bases[0]
+			print classname
 			return type.__new__(meta, classname, (), newClassDict)
 
 # A type constructing function.

@@ -11,6 +11,7 @@ def Grass(x, y):
 	elif x == 0 and y == 0:
 		return Flip(0.0)
 
+# Ah, this bug, where if we use a switch-style function and apply 'rnd' to it and if not every path through the function results in a return value....
 @rnd
 def Sprinkler(x):
 	if x == 1:
@@ -27,6 +28,7 @@ def Rain(x):
 
 C = Flip(0.5)
 
+print "BEGIN PROBLEM LINE"
 S = Sprinkler(C)
 
 R = Rain(C)

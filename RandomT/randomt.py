@@ -29,11 +29,6 @@ def rand_method(self, f, *args, **kwargs):
 ProbDecorate = DictValueMap(lambda f: rnd(f))
 
 MixinComputation = DictOp(dict_add, Computation.__dict__)
-#MixinSampler = DictOp(dict_add, Sampler.__dict__)
-#MixinProbRep = DictOp(dict_add, Probability.__dict__)
-#RDT = DictTransform(MethodRestrictor(), MetaPropertyExcluder(), ProbDecorate, MixinProbRep, MethodRestrictor(), MetaPropertyExcluder())
-
-#RDT = DictTransform(MethodRestrictor(), MetaPropertyExcluder(), ProbDecorate, MixinComputation, MixinSampler, MixinProbRep, ProbMethodRestrictor(), MetaPropertyExcluder())
 RDT = DictTransform(MethodRestrictor(), MetaPropertyExcluder(), ProbDecorate, MixinComputation, ProbMethodRestrictor(), MetaPropertyExcluder())
 
 # The Random metaclass.

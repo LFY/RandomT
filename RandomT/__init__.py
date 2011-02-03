@@ -15,7 +15,7 @@ from randomfunc import *
 
 # Inference
 
-from probrep import sampleVar
+from bn import sampleVar
 
 # TO BE REORGANIZED
 

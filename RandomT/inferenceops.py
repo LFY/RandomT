@@ -1,10 +1,17 @@
 from cpt import FactorTable
 from probrep import Computation
+from probrep import evalVar
 
 from distrep import Dist
 
-from probrep import dist_to_factor
 from bn import LazyNet
+from bn import getLN
+
+def dist_to_factor(name, dist):
+	res = FactorTable(name, (name,))
+	for (v, p) in dist.items():
+		res.addObservation({name: v}, p)
+	return res
 
 def distr_to_mode(d):
 	res = d.items()
@@ -49,13 +56,15 @@ def generate_cpts(ln):
 						return False
 				return True
 			for x in product(*doms):
-				r = v.eval(*x)
+				r = evalVar(v, *x)
+				# computes the nontrivial CPT.
 				if hasattr(r, 'dist') and r.dist is not None:
 					for (val, prob) in r.dist.items():
 						obs = zip([v] + valid_args, [val] + list(x))
 						if is_consistent(obs):
 							cpt.addObservation(dict(obs), prob)
 				else:
+					# we were a deterministic function, so our CPT is trivial
 					obs = zip([v] + valid_args, [r] + list(x))
 					if is_consistent(obs):
 						cpt.addObservation(dict(zip([v] + valid_args, [r] + list(x))), 1.0)
@@ -119,7 +128,7 @@ def debug_output(var, namespace={}):
 	if namespace == {}:
 		namespace = globals()
 
-	N = var.getLN()
+	N = getLN(var)
 	sensible_dict = {}
 	anon_index = 0
 	for v in N.getvars():

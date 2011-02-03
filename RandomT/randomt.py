@@ -1,7 +1,7 @@
 from functional import *
 from classdict import *
 
-from probrep import sampleVar
+from bn import sampleVar
 from probrep import Computation
 
 from distrep import Dist

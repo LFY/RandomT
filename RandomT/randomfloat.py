@@ -26,7 +26,7 @@ def Expectation(v):
 	name = v.srcname
 	if name in ECF.keys():
 		if ECF[name](*v.args):
-			return v.eval(*map(lambda x: Expectation(x), v.args))
+			return evalVar(v, *map(lambda x: Expectation(x), v.args))
 		else:
 			return v.expect()
 	else:

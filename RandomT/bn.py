@@ -1,6 +1,9 @@
 from cpt import FactorTable
 from cpt import Table
+
 from digraph import Digraph
+
+from probrep import evalVar
 
 # 1:1 distr : vertex correspondence
 def tables_to_digraph(ts):
@@ -44,19 +47,17 @@ class LazyNet(object):
 		for v in self.graph.verts():
 			self.funcmap[v] = v.src
 
-		# Cache for samples. each 'row' in this is a consistent assignment to the variables.
 		self.samples = Table(self.getvars())
 		
 		self.assn_order = self.get_assn_order()
 		self.assn_order_arg_indices = [map(lambda x: self.assn_order.index(x), v.args) for v in self.assn_order]
-		#print self.assn_order_arg_indices
-		
+	
+	# Should be a way to write these as structural induction instead
 	def get_assn_order(self, partial={}, order=[]):
 		if set(self.getvars()).issubset(set(partial.keys())):
 			return order
 		else:
 			new_assn = dict(partial)
-			# the viable set: those variables for which all arguments are already there, BUT not already in the partial assignment.
 			def args_fulfilled(v):
 				return len(self.graph.children(v)) == 0 or set(self.graph.children(v)).issubset(set(partial.keys()))
 
@@ -64,11 +65,9 @@ class LazyNet(object):
 			viable = filter(lambda x: x not in partial.keys(), with_arguments)
 			new_order = order + list(viable)
 			
-			# now find assigment for thigns in the viable set.
 			def get_assignment(v):
-				# have to preserve order of v.args. them's the breaks. 
 				arglist = map(lambda x: partial[x], v.args)
-				return v.eval(*arglist)
+				return evalVar(v, *arglist)
 
 			def set_assignment(var, val):
 				new_assn[var] = val
@@ -80,19 +79,19 @@ class LazyNet(object):
 	
 	def eval_var(self, partial, v):
 		if len(v.args) == 0:
-			return v.eval()
+			return evalVar(v)
 		else:
 			arglist = map(lambda x: partial[x], v.args)
-			return v.eval(*arglist)
+			return evalVar(v, *arglist)
 
 	def construct_assignment3(self, relevant=[]):
 		res = range(len(self.assn_order))
 		for i in range(len(self.assn_order)):
 			if len(self.assn_order[i].args) == 0:
-				res[i] = self.assn_order[i].eval()
+				res[i] = evalVar(self.assn_order[i])
 			else:
 				arglist = map(lambda x: res[x], self.assn_order_arg_indices[i])
-				res[i] = self.assn_order[i].eval(*arglist)
+				res[i] = evalVar(self.assn_order[i], *arglist)
 		if relevant == []:
 			return dict(zip(self.assn_order, res))
 		else:
@@ -116,29 +115,24 @@ class LazyNet(object):
 	def getvars(self):
 		return self.funcmap.keys()
 
-	# builds a dictionary containg var: value assignments for the entire network.
 	def construct_assignment(self, partial={}):
 		if set(self.getvars()).issubset(set(partial.keys())):
 			return partial
 		else:
 			new_assn = dict(partial)
-			# the viable set: those variables for which all arguments are already there, BUT not already in the partial assignment.
 			def args_fulfilled(v):
 				return len(v.args) == 0 or set(v.args).issubset(set(partial.keys()))
 
 			with_arguments = filter(lambda v: args_fulfilled(v), self.getvars())
 			viable = filter(lambda x: x not in partial.keys(), with_arguments)
 
-			# now find assigment for thigns in the viable set.
 			def get_assignment(v):
-				# have to preserve order of v.args. them's the breaks. 
 				arglist = map(lambda x: partial[x], v.args)
-				return v.eval(*arglist)
+				return evalVar(v, *arglist)
 
 			def set_assignment(var, val):
 				new_assn[var] = val
 
-			# So very un-functional.
 			map(lambda v: set_assignment(v, get_assignment(v)), viable)
 
 			return self.construct_assignment(new_assn)
@@ -224,6 +218,12 @@ class LazyNet(object):
 			new_adjs = [map(lambda x: names[x], self.graph.children(v)) for v in self.graph.verts()]
 			return Digraph(dict(zip(new_verts, new_adjs))).reverse()
 	
+def getLN(var):
+	return LazyNet((var,))
+
+def sampleVar(var, evidence={}):
+	return getLN(var).conditional_sample(evidence)[var]
+
 class BayesNet(object):
 	def __init__(self, tables):
 		# remove duplicates

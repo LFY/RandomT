@@ -1,21 +1,13 @@
 from random import uniform
-from bn import BayesNet
-from bn import LazyNet
 from cpt import FactorTable
 from itertools import product
 from functional import isFunction
 
 from distrep import Dist
-	
-def dist_to_factor(name, dist):
-	res = FactorTable(name, (name,))
-	for (v, p) in dist.items():
-		res.addObservation({name: v}, p)
-	return res
 
-# Now there is only one sampling function.
-def sampleVar(var, evidence={}):
-	return var.getLN().conditional_sample(evidence)[var]
+
+def evalVar(var, *args):
+	return var.src(*args)
 
 class Computation(object):
 	def __init__(self, source, *a):
@@ -45,16 +37,6 @@ class Computation(object):
 		return self.__hash__() == other.__hash__()
 	def __hash__(self,):
 		return self.__repr__().__hash__()
-	
-	def getLN(self,):
-		return LazyNet((self,))
-		if self.lazynet is None:
-			self.lazynet = LazyNet((self,))
-		return self.lazynet
-	
-	def eval(self, *args):
-		return self.src(*args)
-		
 		
 	def info(self,):
 		return "Random<T>: self=%s src=%s args=%s\n" % (self, self.src, self.args) 
@@ -65,9 +47,3 @@ class Computation(object):
 		else:
 			return self.info() + "\n" + reduce(lambda x, y: x + y, [l * "\t" + a.full_info(l + 1) for a in self.args])
 
-	def get_src(self,):
-		return self.src
-
-	def get_args(self,):
-		return self.args
-	

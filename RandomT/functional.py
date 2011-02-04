@@ -45,9 +45,6 @@ def fmap(func, meta_class, unwrap):
 
 		# This runs the original function. It is assumed that the incoming arguments to the function return a meaningful value after 'unwrap' that will be compatible with the original function; it is assumed that func will return a meaningful value of type a that we then promote to type R a
 		# The return value is only used to determine the type of the result
-		#print "Sampled arguments"
-		#print map(lambda x: unwrap(x), newargs)
-		#print "Observed return value"
 		rtval = func(*map(lambda x: unwrap(x), newargs))
 		#print rtval
 

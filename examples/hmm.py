@@ -45,10 +45,9 @@ for i in range(5):
 	L.append(NextRain(L[-1]))
 	
 # Take some samples.
-print map(lambda x: x.sample(), L)
-print map(lambda x: x.sample(), L)
-print map(lambda x: x.sample(), L)
-print map(lambda x: x.sample(), L)
+print map(lambda x: sampleVar(x), L)
+print map(lambda x: sampleVar(x), L)
+print map(lambda x: sampleVar(x), L)
 
 # What is the probability that it rains on the 6th day given that it did not rain on the first? (Prediction)
 print Pr({L[5] : 1}, {L[0]: 0})
@@ -60,10 +59,10 @@ print Pr({L[0] : 1, L[1]: 1, L[2]: 1, L[3]: 1})
 U = map(lambda x: Umbrella(x), L)
 
 # Takes some samples.
-print map(lambda x: x.sample(), U)
-print map(lambda x: x.sample(), U)
-print map(lambda x: x.sample(), U)
-print map(lambda x: x.sample(), U)
+print map(lambda x: sampleVar(x), U)
+print map(lambda x: sampleVar(x), U)
+print map(lambda x: sampleVar(x), U)
+print map(lambda x: sampleVar(x), U)
 
 # What is the probability that I use an umbrella on the first day?
 print Pr({U[0] : 1})
@@ -127,7 +126,7 @@ def particle_filter(particles, evidence, prior, trans_func, sensor_func):
 	trans = trans_func(prior)
 	sensor = sensor_func(trans)
 	
-	new_samples = map(lambda x: trans.sample({prior : x}), particles)
+	new_samples = map(lambda x: sampleVar(trans, {prior : x}), particles)
 	weights = normalize(map(lambda x: Pr({sensor: evidence}, {trans: x}), new_samples))
 	
 	new_distr = {}
@@ -137,11 +136,11 @@ def particle_filter(particles, evidence, prior, trans_func, sensor_func):
 		new_distr[k] += v
 	
 	new_var = Random(type(new_samples[0]))(Dist(new_distr))
-	resample = map(lambda x: new_var.sample(), range(len(particles)))
+	resample = map(lambda x: sampleVar(new_var), range(len(particles)))
 	return resample
 
 def run_obs_sequence(num_particles, observation, prior, trans_func, sensor_func):
-	start_particles = map(lambda x: prior.sample(), range(num_particles))
+	start_particles = map(lambda x: sampleVar(prior), range(num_particles))
 	result = [start_particles]
 	for evidence in observation:
 		result.append(particle_filter(start_particles, evidence, prior, trans_func, sensor_func))

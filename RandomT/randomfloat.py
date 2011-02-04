@@ -7,6 +7,8 @@ from inferenceops import independent
 
 from bn import LazyNet
 
+from randomt import sampleVar
+
 RandomFloat = Random(float)
 
 # ECF - Expectation commuting functions
@@ -53,7 +55,7 @@ def _expect_(self, samples=9001):
 		factor = 1.0 / samples
 		res = 0.0
 		for i in range(samples):
-			res += self.sample() * factor
+			res += sampleVar(self) * factor
 		return res
 
 def _var_(self, samples=9001):

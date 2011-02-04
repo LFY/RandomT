@@ -18,6 +18,15 @@ def tables_to_digraph(ts):
 	
 	return Digraph(incidence_map)
 
+# There is a recursive function to determine the variables visible from one variable.
+
+# Is it possible to determine this in the 'final' style, i.e., as the expression is evaluated, the list of visible variables is brought along
+
+# I think it might be possible to write a recursive evaluator that produces the sample without this business of reifying the entire thing and then...
+
+# It is basically call by need but including stochastic functions and flattening. How is a call by need interpreter implemented in the final style?
+
+# In order to implement eval-CBN(term), we can't just directyl evaluate everything when stochastic functions are included; we need to memoize results. That means we need to keep track of
 def variables_to_digraph(vs):
 	incidence_map = {}
 	# Anything that this depends upon that we don't have in the network? Add it.
@@ -31,13 +40,32 @@ def variables_to_digraph(vs):
 	all_visibles = all_visible_vars(list(vs))
 	all_vars = list(vs) + all_visibles
 
+	# The incidence map is simply all variables associated with their arguments.
+	# We later end up evaluating this 'backwards' for some reason
+
 	for v in all_vars:
 		incidence_map[v] = v.args
 	
 	return Digraph(incidence_map)
 
+# New sampling method: Evaluate a given LazyNet. Carry context, call recursively
+def eval_rec_var(v):
+	pass
+
+# Instead of variables to digraph, can we form the digraph as the expression is constructed, in the 'final' manner?
+
+# We certainly get an implicit sense, but there is not necessarily
+
+# It is hard to inductively define graphs anyway
+
+# Functional Graph Library?
+
+# What prevents us from writing construct_assigment inductively?
+
 # lazy bayes net, instead of taking a bunch of factor tables, it takes a bunch of Computations.
+
 # for sampling.
+
 class LazyNet(object):
 	def __init__(self, vars):
 		self.min_samples = 9001
@@ -167,6 +195,9 @@ class LazyNet(object):
 		from cpt import projectTable
 
 #		self.fill_samples(N)
+
+		# Generates a table, where the rows are samples of all the variables
+		# 
 			
 		query_evidence = {}
 		if type(_query) is dict:
@@ -546,12 +577,6 @@ def condition_test():
 	
 	print query(T, {'Z': 0})
 	
-#	ZY = pointwise_product(Z, Y)
 
 if __name__ == '__main__':
-#	basic_test()
-#	varelim_test()
-#	nonuniform_test()
-#	sumout_test()
-#	condition_test()
 	merge_test()

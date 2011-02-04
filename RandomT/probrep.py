@@ -17,12 +17,13 @@ def full_info(var, l=1):
 	else:
 		return info(var) + "\n" + reduce(lambda x, y: x + y, [l * "\t" + full_info(a, l + 1) for a in var.args])
 
+# Should this instead build up the directed graph inductively?
+# Computation :: self, args -> repr self, repr args
 class Computation(object):
 	def __init__(self, source, *a):
 		self.dist = None
 		self.cpt = None
 		self.smp_cache = None
-
 
 		self.srcname = ""
 		

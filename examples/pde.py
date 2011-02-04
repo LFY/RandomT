@@ -59,10 +59,9 @@ U = rnd(u)
 # u(x, t) with the uncertain initial conditions.
 
 print "Draws from the random variable U = u(x, t) with uncertain initial conditions."
-print "draw from U @ x = 0 t = 0: %f" % U(0, 0).sample()
-print "draw from U @ x = 0 t = 0: %f" % U(0, 0).sample()
-print "draw from U @ x = 0 t = 0: %f" % U(0, 0).sample()
-print "draw from U @ x = 0 t = 0: %f" % U(0, 0).sample()
+print "draw from U @ x = 0 t = 0: %f" % sampleVar(U(0, 0))
+print "draw from U @ x = 0 t = 0: %f" % sampleVar(U(0, 0))
+print "draw from U @ x = 0 t = 0: %f" % sampleVar(U(0, 0))
 
 print "E[U @ x = 0, t = 0]: %f" % U(0, 0).expect()
 print "Var[U @ x = 0, t = 0]: %f" % U(0, 0).var()
@@ -84,8 +83,8 @@ from RandomT import Uniform
 
 print "Analytical solution to advection equation where velocity is uncertain by a uniform random variate:"
 print "Let U = u(x,t) under this uncertainty."
-print "draw from U @ x = 0, t = 0: %f" % U(0, 0, Uniform(1, 2)).sample()
-print "draw from U @ x = 0, t = 1: %f" % U(0, 1, Uniform(1, 2)).sample()
+print "draw from U @ x = 0, t = 0: %f" % sampleVar(U(0, 0, Uniform(1, 2)))
+print "draw from U @ x = 0, t = 1: %f" % sampleVar(U(0, 1, Uniform(1, 2)))
 
 print "E[U @ x = 0, t = 0]: %f" % U(0, 0, Uniform(1, 2)).expect()
 print "Var[U @ x = 0, t = 0]: %f" % U(0, 0, Uniform(1, 2)).var()

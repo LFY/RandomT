@@ -6,4 +6,50 @@ Installation
 python setup.py build
 python setup.py install
 
-Examples in examples/ directory.
+Usage
+=====
+
+Examples in examples/ directory. Start with basic.py.
+
+1. Import language environment
+
+from RandomT import *
+
+2. Construct random variable
+
+X = Flip() # Is some random integer
+
+3. Combine with other random variables using base class methods
+
+Y = X + X
+
+4. Run probability queries
+
+# Pr(query, evidence, implementation)
+
+print Pr(Y, {}, VarElim)
+{0 : 0.5, 2 : 0.5}
+
+How to make a RandomT random variable
+=====================================
+
+2 ways.
+
+1. Create a 0-arg function (thunk) that performs a draw from the distribution using Random(T) where T is the base type (Will take out this type annotation requirement in a later build).
+
+from random import randint
+
+X = Random(int)(lambda : randint(0, 5))
+
+2. Create a Dist, which holds a dictionary describing the full probability distribution.
+
+X = Random(int)(Dist({0 : 0.2, 1: 0.2, 2: 0.2, 3: 0.2, 4: 0.2}))
+
+Currently supported inference implementations
+===================================
+
+RejectionSampler
+VarElim
+BNT (requires matlab and BNT installation)
+
+

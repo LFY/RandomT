@@ -3,6 +3,9 @@
 from randomt import Random
 from randomt import VectorSpaceRandom
 from randomt import rnd
+from randomt import rfmap
+from randomt import rbind
+from randomt import RndVar
 
 # Basic types
 

@@ -35,15 +35,15 @@ How to make a RandomT random variable
 
 2 ways.
 
-1. Create a 0-arg function (thunk) that performs a draw from the distribution using Random(T) where T is the base type (Will take out this type annotation requirement in a later build).
+1. Create a 0-arg function (thunk) that performs a draw from the distribution.
 
 from random import randint
 
-X = Random(int)(lambda : randint(0, 5))
+X = RndVar(lambda : randint(0, 5))
 
-2. Create a Dist, which holds a dictionary describing the full probability distribution.
+2. Create a Dist, which holds a dictionary describing the full probability distribution. The keys must all be of the same type and must be hashable objects, otherwise the operations on this random variable are not well defined/sampled values cannot be meaningfully compared for equality.
 
-X = Random(int)(Dist({0 : 0.2, 1: 0.2, 2: 0.2, 3: 0.2, 4: 0.2}))
+X = RndVar(Dist({0 : 0.2, 1: 0.2, 2: 0.2, 3: 0.2, 4: 0.2}))
 
 Currently supported inference implementations
 ===================================

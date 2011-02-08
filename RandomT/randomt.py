@@ -16,6 +16,12 @@ def rnd_unwrap(R):
 def rnd(f):
 	return fmap(f, Random_, sampleVar)
 
+def rfmap(f):
+	return fmap(f, Random_, sampleVar)
+
+def rbind(f):
+	return bind(f, Random_, sampleVar)
+
 import inspect
 
 # Restricts to method types.
@@ -26,7 +32,7 @@ class ProbMethodRestrictor(DictOp):
 def rand_method(self, f, *args, **kwargs):
 	return RandomClassMethod(f, self)(*args, **kwargs)
 	
-ProbDecorate = DictValueMap(lambda f: rnd(f))
+ProbDecorate = DictValueMap(lambda f: rfmap(f))
 
 MixinComputation = DictOp(dict_add, Computation.__dict__)
 RDT = DictTransform(MethodRestrictor(), MetaPropertyExcluder(), ProbDecorate, MixinComputation, ProbMethodRestrictor(), MetaPropertyExcluder())
@@ -94,6 +100,15 @@ def Random(base_type):
 	if not hasattr(base_type, '__hash__'):
 		new_type.__hash__ = lambda self: id(self)
 	return new_type
+
+# A function that does both the type construction and value construction
+def RndVar(base_val):
+	if type(base_val) == Dist:
+		return Random(type(base_val.keys()[0]))(base_val)
+	elif isFunction(base_val):
+		return Random(type(base_val()))(base_val)
+	else:
+		return Random(type(base_val))(base_val)
 
 from digraph import Digraph
 from digraph import top_sort

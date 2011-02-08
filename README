@@ -35,7 +35,7 @@ How to make a RandomT random variable
 
 2 ways.
 
-1. Create a 0-arg function (thunk) that performs a draw from the distribution.
+1. Create a 0-arg function (thunk) that performs a draw from the distribution. The function must return values of a consistent type, or the operations on this random variable will not be well defined.
 
 from random import randint
 

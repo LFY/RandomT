@@ -5,7 +5,15 @@ from functional import isFunction
 
 from distrep import Dist
 
+def fromBind(v):
+	return v.srcname.endswith('.bind')
+
+# This is full flattening.
 def evalVar(var, *args):
+	return evalVar(var.src(*args)) if fromBind(var) else var.src(*args)
+
+# This is delayed flattening.
+def evalVar_delay(var, *args):
 	return var.src(*args)
 
 def info(var,):

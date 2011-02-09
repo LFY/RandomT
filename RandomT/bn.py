@@ -38,6 +38,7 @@ def variables_to_digraph(vs):
 def eval_rec_var(v):
 	pass
 
+
 class LazyNet(object):
 	def __init__(self, vars):
 		self.min_samples = 9001
@@ -78,11 +79,15 @@ class LazyNet(object):
 			return self.get_assn_order(new_assn, new_order)
 	
 	def eval_var(self, partial, v):
+		val = None
 		if len(v.args) == 0:
-			return evalVar(v)
+			val = evalVar(v)
 		else:
 			arglist = map(lambda x: partial[x], v.args)
-			return evalVar(v, *arglist)
+			val = evalVar(v, *arglist)
+		return val
+		#print fromBind(v)
+		#return evalVar(val) if fromBind(v) else val
 
 	def construct_assignment3(self, relevant=[]):
 		res = range(len(self.assn_order))

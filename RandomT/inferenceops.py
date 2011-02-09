@@ -1,6 +1,7 @@
 from cpt import FactorTable
 from probrep import Computation
 from probrep import evalVar
+from probrep import evalVar_delay
 
 from distrep import Dist
 
@@ -56,7 +57,7 @@ def generate_cpts(ln):
 						return False
 				return True
 			for x in product(*doms):
-				r = evalVar(v, *x)
+				r = evalVar_delay(v, *x)
 				# computes the nontrivial CPT.
 				if hasattr(r, 'dist') and r.dist is not None:
 					for (val, prob) in r.dist.items():

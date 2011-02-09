@@ -11,7 +11,6 @@ def Grass(x, y):
 	elif x == 0 and y == 0:
 		return Flip(0.0)
 
-# Ah, this bug, where if we use a switch-style function and apply fmap' to it and if not every path through the function results in a return value....
 @rbind
 def Sprinkler(x):
 	if x == 1:

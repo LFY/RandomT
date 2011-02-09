@@ -34,6 +34,7 @@ R = Rain(C)
 
 W = Grass(S, R)
 
-print Pr(W, {}, VarElim) # Interesting; this setup works with VarElim, but RejectionSampler fails. This is probably because VarElim knows about performing the 'join' operation while RejectionSampler is not aware.
+print Pr(W, {}, VarElim) 
+print Pr(W, {}, RejectionSampler) 
 
 print debug_output(W, locals())

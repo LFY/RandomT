@@ -10,7 +10,7 @@ def fromBind(v):
 
 # This is full flattening.
 def evalVar(var, *args):
-	return evalVar(var.src(*args)) if fromBind(var) else var.src(*args)
+	return evalVar_delay(var.src(*args)) if fromBind(var) else var.src(*args)
 
 # This is delayed flattening.
 def evalVar_delay(var, *args):

@@ -1,5 +1,7 @@
 from RandomT import *
 
+Flip = lambda p: RndVar(Dist({1 : p, 0 : 1 - p}))
+
 @rbind
 def Grass(x, y):
 	if x == 1 and y == 1:
@@ -26,11 +28,8 @@ def Rain(x):
 		return Flip(0.8)
 
 C = Flip(0.5)
-
 S = Sprinkler(C)
-
 R = Rain(C)
-
 W = Grass(S, R)
 
 print Pr(W, {}, VarElim) 

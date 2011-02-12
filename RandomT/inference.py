@@ -50,6 +50,9 @@ def Mode(var, evidence={}, engine_constructor=RejectionSampler):
 	marg_result = Marginalize(var_query.keys()[0], evidence, engine_constructor)
 	return distr_to_mode(marg_result)
 
+def PrN(_query, evidence={}):
+	return lambda n : Pr(_query, evidence, lambda model: RejectionSampler(model, n))
+
 def Pr(_query, evidence={}, impl=None, num_samples=9001):
 	query_evidence = {}
 	query = None

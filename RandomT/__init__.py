@@ -35,6 +35,7 @@ from inference import VarElim
 from bnt import BNTEngine
 
 from inference import Pr
+from inference import PrN
 from inference import ML
 
 

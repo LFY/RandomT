@@ -127,7 +127,7 @@ def particle_filter(particles, evidence, prior, trans_func, sensor_func):
 	sensor = sensor_func(trans)
 	
 	new_samples = map(lambda x: sampleVar(trans, {prior : x}), particles)
-	weights = normalize(map(lambda x: Pr({sensor: evidence}, {trans: x}), new_samples))
+	weights = normalize(map(lambda x: PrN({sensor: evidence}, {trans: x})(100), new_samples))
 	
 	new_distr = {}
 	for (k, v) in zip(new_samples, weights):

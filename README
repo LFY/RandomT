@@ -1,7 +1,8 @@
-RandomT: declarative probabilistic programming
-==============================================
+RandomT: declarative probabilistic programming in Python
+========================================================
 
 Installation
+============
 
 python setup.py build
 python setup.py install
@@ -9,15 +10,13 @@ python setup.py install
 Usage
 =====
 
-Examples in examples/ directory. Start with basic.py.
-
 1. Import language environment
 
 from RandomT import *
 
 2. Construct random variable
 
-X = Flip() # Is some random integer
+X = RndVar(lambda : randint(0,1)) # Is some random integer
 
 3. Combine with other random variables using base class methods
 
@@ -25,31 +24,30 @@ Y = X + X
 
 4. Run probability queries
 
-# Pr(query, evidence, implementation)
-
-print Pr(Y, {}, VarElim)
-{0 : 0.5, 2 : 0.5}
+print Pr(Y, {}, rejectionN(500))
 
 How to make a RandomT random variable
 =====================================
 
 2 ways.
 
-1. Create a 0-arg function (thunk) that performs a draw from the distribution. The function must return values of a consistent type, or the operations on this random variable will not be well defined.
+1. Create a 0-arg function (thunk) that performs a draw from the distribution.
+The function must return values of a consistent type, or the operations on this
+random variable will not be well defined.
 
 from random import randint
 
 X = RndVar(lambda : randint(0, 5))
 
-2. Create a Dist, which holds a dictionary describing the full probability distribution. The keys must all be of the same type and must be hashable objects, otherwise the operations on this random variable are not well defined/sampled values cannot be meaningfully compared for equality.
+2. Create a Dist, which holds a dictionary describing the full probability
+distribution. The keys must all be of the same type and must be hashable
+objects, otherwise the operations on this random variable are not well
+defined/sampled values cannot be meaningfully compared for equality.
 
 X = RndVar(Dist({0 : 0.2, 1: 0.2, 2: 0.2, 3: 0.2, 4: 0.2}))
 
-Currently supported inference implementations
-===================================
+Currently supported inference algorithms
+========================================
 
-RejectionSampler
-VarElim
-BNT (requires matlab and BNT installation)
-
+rejectionN(numsamples) - simple rejection sampling, works on any model
 

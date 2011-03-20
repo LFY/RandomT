@@ -1,6 +1,9 @@
 from util import *
 from interpreters import *
 
+from samplers import *
+
+from inspect import isfunction
 
 def rejectionsampler(query, evidence, samples, interp=lambda vs: multi_eval_memo_store(vs)[0]):
     all_vars = [query] + evidence.keys()
@@ -34,3 +37,6 @@ def rejectionsampler(query, evidence, samples, interp=lambda vs: multi_eval_memo
 
 rejectionN = lambda n: lambda query, evidence: rejectionsampler(query, evidence, n)
 
+
+def metropolis_hastings(query, evidence, numIter):
+    pass

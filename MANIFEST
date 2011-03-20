@@ -1,6 +1,7 @@
 README
 setup.py
 RandomT/__init__.py
+RandomT/cpt_ops.py
 RandomT/discrete_dist.py
 RandomT/inference.py
 RandomT/interpreters.py
@@ -9,3 +10,5 @@ RandomT/smallstep.py
 RandomT/syntax.py
 RandomT/terms.py
 RandomT/util.py
+RandomT/samplers/MH.py
+RandomT/samplers/__init__.py

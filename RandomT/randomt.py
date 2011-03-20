@@ -17,7 +17,7 @@ def rfmap(f, interp=evalapp_bind):
         other_exprs = map(lambda e: e.expr, args)
         app_node = Fmap(f, *other_exprs)
         result = interp(app_node)
-        return mk_class_with_interface(type(result), interp)(app_node)
+        return mk_class_with_interface(type(result), interp, Fmap)(app_node)
     return call
 
 def rbind(f, interp=evalapp_bind):
@@ -25,7 +25,7 @@ def rbind(f, interp=evalapp_bind):
         other_exprs = map(lambda e: e.expr, args)
         app_node = Bind(f, *other_exprs)
         result = interp(app_node)
-        return mk_class_with_interface(type(result), interp)(app_node)
+        return mk_class_with_interface(type(result), interp, Fmap)(app_node)
     return call
 
 def RndVar(gen, *args):

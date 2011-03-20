@@ -1,6 +1,7 @@
 from util import *
 
 from terms import Bind
+from terms import Fail
 
 from smallstep import store_bind_answer
 
@@ -8,41 +9,41 @@ from discrete_dist import Dist
 
 from syntax import evalDExpr
 
+def evalapp_memo(app_expr, env={}):
+    return store_bind_answer(
+            env,
+            app_expr,
+            map(lambda a: evalapp_bind(a, env), app_expr.args),
+            inner_interp = None,
+            answer_interp = lambda sym, *args: sym.func(*args),
+            is_bind = lambda sym: False)
+
 def evalapp_bind(app_expr, env={}):
     return store_bind_answer(
             env,
             app_expr,
             map(lambda a: evalapp_bind(a, env), app_expr.args),
-            inner_interp = evalDExpr,
+            inner_interp = lambda e: evalapp_memo(evalDExpr(e)),
             answer_interp = lambda sym, *args: sym.func(*args),
             is_bind = lambda sym: type(sym) == Bind)
 
-from itertools import product
+# An interpreter that fails early given an evidence query
 
-def gen_cpt_strict(sym, *_dists):
-    dists = map(lambda d: d.data, _dists)
-    if len(dists) == 0:
-        return sym.func
+def evalapp_bind_evidence(app_expr, evidence, env={}):
+    if inconsistent(env, evidence):
+        return Fail(env)
+    else:
+        return store_bind_answer(
+                env,
+                app_expr,
+                map(lambda a: evalapp_bind_evidence(a, env), app_expr.args),
+                inner_interp = evalDExpr,
+                answer_interp = lambda sym, *args: sym.func(*args),
+                is_bind = lambda sym: type(sym) == Bind)
 
-    keys = list(set(_dists))
+# Discrete distributions: strictly specified probability tables
 
-    dist_items = [(d, fsts(d.data.items())) if d.cond == False else (d, fsts(fsts(d.data.items()))) for d in keys]
-
-    res = {}
-
-    for vs in product(*snds(dist_items)):
-
-        dist_vs = [(d, v) for (d, v) in zip(keys, vs)]
-
-        dist_vs_dict = dict(dist_vs)
-
-        vals = tuple(map(lambda d: dist_vs_dict[d], _dists))
-
-        result_val = sym.func(*vals)
-
-        res[(result_val, vals)] = res.get((result_val, vals), 0) + 1.0
-    
-    return Dist(res, conditional=True)
+from cpt_ops import gen_cpt_strict
 
 def evalapp_discrete_shallow(app_expr, env={}):
     return store_bind_answer(

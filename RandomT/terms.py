@@ -9,3 +9,8 @@ class Fmap(App):
 class Bind(App):
     pass
 
+# Term representing failure of a computation
+
+class Fail(object):
+    def __init__(self, fail_env):
+        self.env = fail_env

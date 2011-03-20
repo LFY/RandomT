@@ -46,7 +46,14 @@ def inconsistent(env, evidence):
     return res
 
 def evalapp_bind_evidence(app_expr, evidence, env={}):
-    # Early failure: don't run small-step interpreter if there is a fail detected.
+
+    # First check for failure: if the environment is already inconsistent
+
+    if inconsistent(env, evidence):
+        return Fail(env)
+
+    # Propagate failed computations without running small-step evaluator
+
     answers = map(lambda a: evalapp_bind_evidence(a, evidence, env), app_expr.args)
     for a in answers:
         if type(a) == Fail:
@@ -59,6 +66,9 @@ def evalapp_bind_evidence(app_expr, evidence, env={}):
                 inner_interp = evalDExpr,
                 answer_interp = lambda sym, *args: sym.func(*args),
                 is_bind = lambda sym: type(sym) == Bind)
+
+    # Second check for failure: if the environment after calculating app_expr
+    # is inconsistent
 
     if inconsistent(env, evidence):
         return Fail(env)

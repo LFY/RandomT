@@ -1,6 +1,7 @@
 README
 setup.py
 RandomT/__init__.py
+RandomT/builtin_dists.py
 RandomT/cpt_ops.py
 RandomT/discrete_dist.py
 RandomT/inference.py

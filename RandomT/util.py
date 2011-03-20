@@ -1,5 +1,6 @@
 from random import uniform
 from random import randint
+from inspect import isfunction
 
 # Extra dictionary operations
 
@@ -50,3 +51,4 @@ def normalize(xs):
 def norm_dict(d):
     total = float(sum(d.values()))
     return dict(map(lambda (k, v): (k, v / total), d.items()))
+

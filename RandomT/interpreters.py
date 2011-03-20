@@ -28,18 +28,42 @@ def evalapp_bind(app_expr, env={}):
             is_bind = lambda sym: type(sym) == Bind)
 
 # An interpreter that fails early given an evidence query
+unDE_evidence = lambda evidence: mapd(lambda (k, v): (evalDExpr(k), v), evidence)
+
+def check_evidence(v, val, evidence):
+    unwrapped = unDE_evidence(evidence)
+    if unwrapped.has_key(v):
+        if isfunction(unwrapped[v]):
+            return unwrapped[v](val)
+        else:
+            return val == unwrapped[v]
+    else:
+        return True
+
+def inconsistent(env, evidence):
+    cleaned = cleanEnv(env)
+    res = not conj(map(lambda (k, v): check_evidence(k, v, evidence), cleaned.items()))
+    return res
 
 def evalapp_bind_evidence(app_expr, evidence, env={}):
-    if inconsistent(env, evidence):
-        return Fail(env)
-    else:
-        return store_bind_answer(
+    # Early failure: don't run small-step interpreter if there is a fail detected.
+    answers = map(lambda a: evalapp_bind_evidence(a, evidence, env), app_expr.args)
+    for a in answers:
+        if type(a) == Fail:
+            return a
+
+    result = store_bind_answer(
                 env,
                 app_expr,
-                map(lambda a: evalapp_bind_evidence(a, env), app_expr.args),
+                answers,
                 inner_interp = evalDExpr,
                 answer_interp = lambda sym, *args: sym.func(*args),
                 is_bind = lambda sym: type(sym) == Bind)
+
+    if inconsistent(env, evidence):
+        return Fail(env)
+
+    return result
 
 # Discrete distributions: strictly specified probability tables
 

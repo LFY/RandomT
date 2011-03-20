@@ -12,6 +12,8 @@ from interpreters import getCPTs
 from syntax import mk_class_with_interface
 from syntax import evalDExpr
 
+from discrete_dist import Dist
+
 def rfmap(f, interp=evalapp_bind):
     def call(*args):
         other_exprs = map(lambda e: e.expr, args)

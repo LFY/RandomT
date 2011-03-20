@@ -15,6 +15,7 @@ class Dist(object):
             return Dist(accum_dict(consistent_data))
     def norm(self,):
         self.data = norm_dict(data)
+        return self
     def __call__(self, *args):
         return self.sample(*args)
     def sample(self,*args):

@@ -1,4 +1,5 @@
 from RandomT import *
+from pprint import pprint
 
 # Deterministic function lifting
 
@@ -10,7 +11,7 @@ Z = X + Y
 
 print Pr(Z, {}, rejectionN(50))
 
-print getCPTs(Z)
+pprint(getCPTs(Z))
 
 randstr = lambda : RndVar(Dist({"ABC" : 0.5, "abc" : 0.5}))
 
@@ -25,9 +26,9 @@ print Pr(X, {Eq : True}, rejectionN(50))
 F = rbind(lambda x: flip(0.2) if x else flip(0.8))
 
 print sampleVar(F(X))
-print getCPTs(F(X))
+pprint(getCPTs(F(X)))
 
 print sampleVar(F(F(X)))
-print getCPTs(F(F(X)))
+pprint(getCPTs(F(F(X))))
 
 print Pr(F(X), {}, rejectionN(50))

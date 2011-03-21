@@ -1,4 +1,5 @@
 from util import *
+from pprint import pformat
 
 class Dist(object):
     def __init__(self, data, conditional=False):
@@ -33,5 +34,5 @@ class Dist(object):
                 break                
         return vals[ind]
     def __repr__(self):
-        return "Dist %s" % self.data if not self.cond else "CPT %s" % self.data
+        return "Dist:\n%s" % pformat(self.data) if not self.cond else "CPT:\n%s" % pformat(self.data)
 

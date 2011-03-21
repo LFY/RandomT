@@ -16,3 +16,4 @@
 *.aux
 *.vrb
 build
+dist

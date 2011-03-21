@@ -31,12 +31,11 @@ def evalapp_bind(app_expr, env={}):
 unDE_evidence = lambda evidence: mapd(lambda (k, v): (evalDExpr(k), v), evidence)
 
 def check_evidence(v, val, evidence):
-    unwrapped = unDE_evidence(evidence)
-    if unwrapped.has_key(v):
-        if isfunction(unwrapped[v]):
-            return unwrapped[v](val)
+    if evidence.has_key(v):
+        if isfunction(evidence[v]):
+            return evidence[v](val)
         else:
-            return val == unwrapped[v]
+            return val == evidence[v]
     else:
         return True
 
@@ -45,7 +44,26 @@ def inconsistent(env, evidence):
     res = not conj(map(lambda (k, v): check_evidence(k, v, evidence), cleaned.items()))
     return res
 
+
 def evalapp_bind_evidence(app_expr, evidence, env={}):
+    # Note that in order to work correctly, evalapp_bind_evidence needs to also
+    # evaluate the variables in evidence 
+
+    # Question: What is the best order, if any?
+
+    uneval = filter(lambda k: k not in env.keys() and app_expr != k, evidence.keys())
+
+    early_answers = map(lambda k: evalapp_bind_evidence_partial(k, evidence,env), uneval)
+
+    for a in early_answers:
+        if type(a) == Fail:
+            return a
+
+    return evalapp_bind_evidence_partial(app_expr, evidence, env)
+
+
+
+def evalapp_bind_evidence_partial(app_expr, evidence, env={}):
 
     # First check for failure: if the environment is already inconsistent
 
@@ -54,7 +72,7 @@ def evalapp_bind_evidence(app_expr, evidence, env={}):
 
     # Propagate failed computations without running small-step evaluator
 
-    answers = map(lambda a: evalapp_bind_evidence(a, evidence, env), app_expr.args)
+    answers = map(lambda a: evalapp_bind_evidence_partial(a, evidence, env), app_expr.args)
     for a in answers:
         if type(a) == Fail:
             return a

@@ -14,3 +14,9 @@ class Bind(App):
 class Fail(object):
     def __init__(self, fail_env):
         self.env = fail_env
+
+# Term representing functional abstraction
+
+#class Lam(object):
+#    def __init__(self, func):
+#        self.func = func

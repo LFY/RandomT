@@ -1,6 +1,8 @@
 from randomt import *
 
 Flip = lambda p = 0.5: RndVar(Dist({True : float(p), False : 1 - float(p)}))
+Binary = lambda p = 0.5: RndVar(Dist({1 : float(p), 0 : 1 - float(p)}))
+
 
 from random import uniform
 

@@ -9,6 +9,9 @@ from discrete_dist import Dist
 
 from syntax import evalDExpr
 
+def cleanEnv(env):
+    return dict(map(lambda ((sym, vals), answer): (sym, answer), env.items()))
+
 def evalapp_memo(app_expr, env={}):
     return store_bind_answer(
             env,
@@ -122,8 +125,6 @@ def evalapp_bind_discrete(app_expr, env={}):
             answer_interp = gen_cpt_strict,
             is_bind = lambda sym: type(sym) == Bind)
 
-def cleanEnv(env):
-    return dict(map(lambda ((sym, vals), answer): (sym, answer), env.items()))
     
 def sampleVar(abs_expr):
     res_env = {}

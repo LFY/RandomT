@@ -15,8 +15,20 @@ class Fail(object):
     def __init__(self, fail_env):
         self.env = fail_env
 
-# Term representing functional abstraction
+# TODO: Terms representing functional abstraction and fixpoint
 
 #class Lam(object):
 #    def __init__(self, func):
 #        self.func = func
+
+#class Fix(object):
+#    def __init__(self, func):
+#        self.func = func
+
+# TODO: Term representing variable _introduction_
+
+# class Var(object):
+#    def __init__(self, val):
+#        self.val = val
+
+

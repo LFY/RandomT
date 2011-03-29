@@ -37,6 +37,8 @@ def accum_dict(xys, zero=0, binop = lambda x, y: x + y):
 snds = lambda xys: map(lambda (x, y): y, xys)
 fsts = lambda xys: map(lambda (x, y): x, xys)
 
+nths = lambda xs, n: map(lambda ts: ts[n], xs)
+
 nub = lambda xs: list(set(xs))
 concat = lambda xss: reduce(lambda x, y: x + y, xss, [])
 
@@ -51,4 +53,12 @@ def normalize(xs):
 def norm_dict(d):
     total = float(sum(d.values()))
     return dict(map(lambda (k, v): (k, v / total), d.items()))
+
+# Ranges
+
+interp_range = lambda min, max, n: map(lambda i: min + (float(i) / (n - 1)) * float(max - min), range(n))
+
+meshgrid = lambda xs, ys: ([xs] * len(ys), zip(*([ys] * len(xs))))
+
+coordgrid = lambda mesh: map(lambda cs: zip(*cs), zip(*mesh))
 

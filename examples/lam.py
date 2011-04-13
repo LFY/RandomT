@@ -31,3 +31,8 @@ eval1 = lambda expr, env = {} : store1(
 
 print eval1(Z)
 
+# The question is, how to do Pr(Xor1 | X), Pr(X | Xor1 == f) ?
+
+# We can consider several approaches for tackling this problem.
+
+

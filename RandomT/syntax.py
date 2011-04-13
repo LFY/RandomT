@@ -6,13 +6,14 @@ class DerivedExpr(object):
 
 evalDExpr = lambda de: de.expr
 
-def mk_class_with_interface(some_class, interp, ast_type):
+def mk_class_with_interface(some_class, interp, ast_type, promote = lambda a: a):
     def make_abstract(method):
         def abstract_method_call(self, *args):
-            other_exprs = map(lambda e: e.expr, args)
+            promoted = map(promote, args)
+            other_exprs = map(lambda e: e.expr, promoted)
             app_node = ast_type(method, self.expr, *other_exprs)
             result = interp(app_node) # Fully evaluate to figure out the class to imitate
-            return mk_class_with_interface(type(result), interp, ast_type)(app_node)
+            return mk_class_with_interface(type(result), interp, ast_type, promote)(app_node)
         return abstract_method_call
 
     methods_only = filterdv(
@@ -28,6 +29,7 @@ def mk_class_with_interface(some_class, interp, ast_type):
                 '__getattribute__',
                 '__getformat__',
                 '__repr__',
+                '__init__',
                 '__str__'],
             methods_only)
 

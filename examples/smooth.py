@@ -140,6 +140,8 @@ def test4():
 
     plot_smoothed(0.0, 1)
     plot_smoothed(2.0, 1000)
+    plot_smoothed(4.0, 1000)
+    plot_smoothed(8.0, 1000)
 
     plt.savefig('gearbox.pdf')
 

@@ -14,6 +14,7 @@ from syntax import evalDExpr
 from syntax import DerivedExpr
 
 from discrete_dist import Dist
+from discrete_dist import Empty
 
 from inference import rejectionN
 
@@ -25,7 +26,7 @@ def promote(x):
 
 def rfmap(f, interp=evalapp_bind):
     def call(*args):
-        other_exprs = map(lambda e: e.expr, args)
+        other_exprs = map(lambda e: e.expr, map(promote, args))
         app_node = Fmap(f, *other_exprs)
         result = interp(app_node)
         return mk_class_with_interface(type(result), interp, Fmap, promote)(app_node)
@@ -33,10 +34,10 @@ def rfmap(f, interp=evalapp_bind):
 
 def rbind(f, interp=evalapp_bind):
     def call(*args):
-        other_exprs = map(lambda e: e.expr, args)
+        other_exprs = map(lambda e: e.expr, map(promote, args))
         app_node = Bind(f, *other_exprs)
         result = interp(app_node)
-        return mk_class_with_interface(type(result), interp, Fmap)(app_node)
+        return mk_class_with_interface(type(result), interp, Fmap, promote)(app_node)
     return call
 
 def RndVar(gen, *args):
@@ -45,3 +46,9 @@ def RndVar(gen, *args):
 def Pr(query, evidence={}, impl=rejectionN(1000)):
     eval_evidence = dict(map(lambda (k, v): (evalDExpr(k), v), evidence.items()))
     return impl(evalDExpr(query), eval_evidence)
+
+def condSample(query, evidence):
+    res = Dist(Pr(query, evidence, rejectionN(1)))()
+    while type(res) == Empty:
+        res = Dist(Pr(query, evidence, rejectionN(1)))()
+    return res

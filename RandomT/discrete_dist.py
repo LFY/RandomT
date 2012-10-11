@@ -1,6 +1,9 @@
 from util import *
 from pprint import pformat
 
+class Empty(object):
+    pass
+
 class Dist(object):
     def __init__(self, data, conditional=False):
         self.cond = conditional
@@ -15,14 +18,19 @@ class Dist(object):
             consistent_data = map(lambda ((v, vals), prob): (v, prob), filter(lambda ((v, vals), prob): vals == args, self.data.items()))
             return Dist(accum_dict(consistent_data))
     def norm(self,):
-        self.data = norm_dict(data)
+        self.data = norm_dict(self.data)
         return self
     def __call__(self, *args):
         return self.sample(*args)
     def sample(self,*args):
+        it = self.data.items()
+
+        if len(it) == 0:
+            return Empty()
+
         t = uniform(0,1)
-        probs = [v for (k, v) in self.data.items()]
-        vals = [k for (k, v) in self.data.items()]
+        probs = [v for (k, v) in it]
+        vals = [k for (k, v) in it]
         ind = 0
                         
         for i in range(len(probs)):

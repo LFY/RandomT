@@ -10,10 +10,12 @@ Uniform = lambda a = 0, b = 1: RndVar(lambda : uniform(a, b))
 
 Multinom = lambda d: RndVar(Dist(d))
 
-Selection = lambda xs: RndVar(Dist(dict(map(lambda x: (x, 1.0), xs))).norm())
+Selection = lambda *xs: RndVar(Dist(dict(map(lambda x: (x, 1.0), xs))).norm())
 
 Constant = lambda x: RndVar(Dist({x : 1.0}))
 
 from random import gauss
 
 Gaussian = lambda m, v: RndVar(lambda : gauss(m, v))
+
+Tuple = rfmap(lambda *xs: tuple(xs))

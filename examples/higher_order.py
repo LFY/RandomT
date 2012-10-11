@@ -65,4 +65,14 @@ print sampleVar(Z)
 print sampleVar(Z)
 print sampleVar(Z)
 
+def line():
 
+    F = rfmap(lambda w, b: Func(lambda x: w * x + b))
+    L = F(Uniform(-100, 100), Uniform(0, 10))
+
+    def between(f):
+        return f(3) < 3 and f(0) > 4
+
+    print Pr(L, {L : between}) #...!
+
+line()
